@@ -15,8 +15,8 @@ function map() {
     for (var i = 0; i < places.length; i++){
         var marker = new google.maps.Marker({
             heading: places[i].heading,
-            position: places[i].location,
             content: places[i].image,
+            position: places[i].location,
             animation: google.maps.Animation.DROP,
         });
         some.push(marker);
