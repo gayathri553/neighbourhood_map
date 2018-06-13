@@ -24,3 +24,6 @@ Maps
 ##### Resources used:
       To get a brief idea of maps and marker I used a video in Youtube.This link is as follows:
       https://www.youtube.com/watch?v=Zxf1mnP5zcw
+      Knockout functionality
+      Udacity Resources of my classroom in my nano degree course.
+      
