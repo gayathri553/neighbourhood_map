@@ -23,6 +23,7 @@ Maps
          knockout JS
 ###### To Run:
 ###### Open the index.html file in our available Browser.
+###### Make sure that all this files be in same path.
 ##### Resources used:
       To get a brief idea of maps and marker I used a video in Youtube.This link is as follows:
       https://www.youtube.com/watch?v=Zxf1mnP5zcw
