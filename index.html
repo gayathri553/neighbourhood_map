@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <title>GoogleMap</title>
+      <link rel="stylesheet"href="css/googlemap.css">
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+   </head>
+  <body>
+    <h1>Neighbourhood Map</h1>
+    <div id="googlemap"></div>
+    <div class="find">
+    <div id="error" class="alert alert-danger" data-bind="text: error, visible: displayError"></div>
+    <center>
+        <input class="searchbar" type="search" name="search" placeholder="Find " data-bind="value: inputValue, valueUpdate: 'keyup'">
+</center>  
+    <div id="SearchList">
+        <ul class="list-group" style="cursor: pointer;" data-bind="foreach: list">
+        <li class="list-group-item" data-bind="text: heading, click: findLocation"></li>
+    </ul>
+
+    </div>
+    </div>    
+    <script src="lib/knockout.js"></script>
+    <script src="js/main.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places,drawing,geometry&key=AIzaSyB2qY4XN6IXlutSxtze5uURDvDioY0d_vU&callback=map" onerror="googleMapsError()"></script>
+  </body>
+  </html>

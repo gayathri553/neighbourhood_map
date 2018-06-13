@@ -1,0 +1,28 @@
+#googlemap{
+    height:500px;
+    width:75%;
+}
+h1{
+    color:white;
+    background-color:darkorchid;
+    font-family:sans-serif;
+    text-align:center;
+}
+img{
+    width:250px;
+    height:250px;
+}
+.searchbar
+{
+    width:100%;
+}
+.find {
+    float: left;
+    width:25%;
+    height:250px;
+    border: 2px solid darkorchid;
+    margin-left:1050px;
+    margin-top: -500px;
+}
+
+
