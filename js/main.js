@@ -36,12 +36,6 @@ function showlocation(){
     place.fitBounds(edges);
 }
 //this function is used to hide the location
-function hidelocation(){
-    for(var i = 0; i< some.length; i++){
-        some[i].setMap(null);
-    }
-}
-//this function is used to hide the location
 function findLocation(value){
     if (openwindow.marker != value.location) {
         for (var i= 0; i < some.length; i++) {
