@@ -1,5 +1,8 @@
 var some=[];
-var openwindow,place;
+var openwindow,place,marker;
+// request for JSON of foursquare data
+var clientID = 'D54CX2SYHKPSEIYEFTR0L3TXUWXBNQZWQANTWPOIAY4FKZYD';
+var clientSecret = 'RO0J1ML2QL05BH1CUKUW2DXPGL5X0V4MG5ZXDMXXUJHLUAAR';
 // to get map ocation for our requriment
 function map() {
     var bhimavaram = {
@@ -23,9 +26,13 @@ function map() {
         marker.addListener('click',function(){
             infoAttract(this,openwindow);
         });
-    }
+        }
     showlocation();
 }
+function bgChange(bg) {
+    document.marker.style.background=bg;
+}
+
 //show the location
 function showlocation(){
     var edges = new google.maps.LatLngBounds();
@@ -46,21 +53,46 @@ function findLocation(value){
         }
     }
 }
+function four(){
+    var reqURL = 'https://foursquare.com/developers/app' + marker.location.lat + ',' + marker.location.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20160118'  + '&query=' + marker.heading;
+    $.getJSON(reqURL).done(function(data) {
+		var results = data.response.app[0];
+        marker.street = results.location.formattedAddress[0] ? results.location.formattedAddress[0]: 'N/A';
+        marker.city = results.location.formattedAddress[1] ? results.location.formattedAddress[1]: 'N/A';
+        marker.phone = results.contact.formattedPhone ? results.contact.formattedPhone : 'N/A';
+        marker.htmlfoursquare =
+                    '<h5 class="iw_subtitle">(' + marker.category +
+                    ')</h5>' + '<div>' +
+                    '<h6 class="iw_address_title"> Address: </h6>' +
+                    '<p class="iw_address">' + marker.street + '</p>' +
+                    '<p class="iw_address">' + marker.city + '</p>' +
+                    '<p class="iw_address">' + marker.zip + '</p>' +
+                    '<p class="iw_address">' + marker.country +
+                    '</p>' + '</div>' + '</div>';
+
+                openwindow.setContent(marker.htmlContent + marker.htmlfoursquare);
+    }).fail(function() {
+        alert('Something went wrong with foursquare');
+    });
+}
 // when selecting the place this function gives the datails of our window
 function windows(marker){    
-    var content = '<div class="contentset"> <h2>This Place is ' + marker.heading + ' in Bhimavaram.</h2></div><div class="content"><center><img src="'+ marker.content + '"></center></div>';
+    var content = '<div class="contentset"> <h3>This Place is ' + marker.heading + ' in Bhimavaram.</h3></div><div class="content"><h4>'+ marker.content + '</h4></div>';
         openwindow.setContent(content);
-        showlocation();
-        
-    }
+        showlocation();    
+    }       
 // function is used to make the marker to bounce
 function setBounce(marker) {
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(function() {
-            marker.setAnimation(null);
-        }, 652);
-}
-var seepage = {
+    if (marker.getAnimation() !== null) {
+      marker.setAnimation(null);
+    } else {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(function() {
+          marker.setAnimation(null);
+      }, 700);
+    }
+  }
+  var seepage = {
     //search for query
     inputValue: ko.observable(''),
     list: ko.observableArray([]),
@@ -100,27 +132,28 @@ var places = [
     {
         heading: 'Railway Station', 
         location: {lat: 16.5442, lng:81.5375}, 
-        image: 'http://mw2.google.com/mw-panoramio/photos/medium/66831435.jpg'
+        image: 'street:Housing Board colony,1-72/A'
+                        
     },
     {
         heading: 'Famous Hotel', 
         location: {lat: 16.5442479, lng: 81.5149185}, 
-        image: 'https://content3.jdmagicbox.com/comp/bhimavaram/s9/9999p8816.8816.100906220425.q9s9/catalogue/hotel-sri-abhiruchi-a-c-bhimavaram-ho-bhimavaram-home-delivery-restaurants-1405jir.jpg'
+        image: 'street:Juvalapallem Road'
     },
     {
         heading: 'Bus Station', 
         location: {lat: 16.5443195, lng: 81.5169033}, 
-        image : 'http://static.panoramio.com/photos/large/25510716.jpg'
+        image : 'street:Menty Vari thota,phone:N/A'
     },
     {
         heading: 'Famous Temple', 
         location: {lat: 16.5428, lng: 81.5234113},
-        image : 'https://templesinindiainfo.com/wp-content/uploads/2016/12/Sri-Mavullamma-Ammavaru-Temple-Bhimavaram.jpg'
+        image : 'street:Gunupudi'
     },
     {
         heading: 'Top College', 
         location: {lat: 16.5674794, lng: 81.5217052}, 
-        image : 'http://www.icbse.com/colleges/media/clgimg/1-3592461.jpg'
+        image : 'street:vishnupur,phone:N/A'
     }
     ];
     seepage.initialize();
