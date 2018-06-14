@@ -3,8 +3,8 @@
     width:75%;
 }
 h1{
-    color:white;
-    background-color:darkorchid;
+    color:darkorchid;
+    background-color:white
     font-family:sans-serif;
     text-align:center;
 }
@@ -24,5 +24,6 @@ img{
     margin-left:1050px;
     margin-top: -500px;
 }
+
 
 
