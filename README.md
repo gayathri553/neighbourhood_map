@@ -24,6 +24,11 @@ Maps
 ###### To Run:
 ###### Open the index.html file in our available Browser.
 ###### Make sure that all this files be in same path.
+##### Four square AIP as Third-party:
+###### This AIP is used as third-party provider for our map which is required.For this we need some Client ID and Client Secret.
+###### Link for this foursquare AIP is https://foursquare.com/developers/register
+###### After registration we need to create app by giving the our github app link for this account.
+###### Then we get the details of Client ID and Client seceret which is used in our js file to get the place information.
 ##### Resources used:
       To get a brief idea of maps and marker I used a video in Youtube.This link is as follows:
       https://www.youtube.com/watch?v=Zxf1mnP5zcw
