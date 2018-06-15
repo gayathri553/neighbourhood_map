@@ -1,4 +1,4 @@
-var some=[];
+// declaring global variables
 var openwindow,place,marker;
 // request for JSON of foursquare data
 var clientID = 'D54CX2SYHKPSEIYEFTR0L3TXUWXBNQZWQANTWPOIAY4FKZYD';
@@ -14,74 +14,11 @@ function map() {
         zoom:13,
         center: bhimavaram
     });
-    openwindow=new google.maps.InfoWindow();
-    for (var i = 0; i < places.length; i++){
-        var marker = new google.maps.Marker({
-            heading: places[i].heading,
-            content: places[i].image,
-            position: places[i].location,
-            animation: google.maps.Animation.DROP,
-        });
-        some.push(marker);
-        marker.addListener('click',function(){
-            infoAttract(this,openwindow);
-        });
-        }
-    showlocation();
+    openwindow = new google.maps.InfoWindow();
+    edges = new google.maps.LatLngBounds();   
+    ko.applyBindings(new Design());
 }
-function bgChange(bg) {
-    document.marker.style.background=bg;
-}
-
-//show the location
-function showlocation(){
-    var edges = new google.maps.LatLngBounds();
-    for (var i = 0; i < some.length; i++){
-        some[i].setMap(place);
-        edges.extend(some[i].position);
-    }
-    place.fitBounds(edges);
-}
-//this function is used to hide the location
-function findLocation(value){
-    if (openwindow.marker != value.location) {
-        for (var i= 0; i < some.length; i++) {
-            if (some[i].heading == value.heading) {
-                infoAttract(some[i], openwindow);
-                break;
-            }
-        }
-    }
-}
-function four(){
-    var reqURL = 'https://foursquare.com/developers/app' + marker.location.lat + ',' + marker.location.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20160118'  + '&query=' + marker.heading;
-    $.getJSON(reqURL).done(function(data) {
-		var results = data.response.app[0];
-        marker.street = results.location.formattedAddress[0] ? results.location.formattedAddress[0]: 'N/A';
-        marker.city = results.location.formattedAddress[1] ? results.location.formattedAddress[1]: 'N/A';
-        marker.phone = results.contact.formattedPhone ? results.contact.formattedPhone : 'N/A';
-        marker.htmlfoursquare =
-                    '<h5 class="iw_subtitle">(' + marker.category +
-                    ')</h5>' + '<div>' +
-                    '<h6 class="iw_address_title"> Address: </h6>' +
-                    '<p class="iw_address">' + marker.street + '</p>' +
-                    '<p class="iw_address">' + marker.city + '</p>' +
-                    '<p class="iw_address">' + marker.zip + '</p>' +
-                    '<p class="iw_address">' + marker.country +
-                    '</p>' + '</div>' + '</div>';
-
-                openwindow.setContent(marker.htmlContent + marker.htmlfoursquare);
-    }).fail(function() {
-        alert('Something went wrong with foursquare');
-    });
-}
-// when selecting the place this function gives the datails of our window
-function windows(marker){    
-    var content = '<div class="contentset"> <h3>This Place is ' + marker.heading + ' in Bhimavaram.</h3></div><div class="content"><h4>'+ marker.content + '</h4></div>';
-        openwindow.setContent(content);
-        showlocation();    
-    }       
-// function is used to make the marker to bounce
+//set the Bounce function
 function setBounce(marker) {
     if (marker.getAnimation() !== null) {
       marker.setAnimation(null);
@@ -89,88 +26,134 @@ function setBounce(marker) {
       marker.setAnimation(google.maps.Animation.BOUNCE);
       setTimeout(function() {
           marker.setAnimation(null);
-      }, 700);
+      }, 1400);
     }
   }
-  var seepage = {
-    //search for query
-    inputValue: ko.observable(''),
-    list: ko.observableArray([]),
-    displayList: ko.observable(true),
-    displayError: ko.observable(false),
-    error: ko.observable(''),
-    initialize: function(condition){for(var j in places){
-            seepage.list.push(places[j]);
+//this function is used to show the location
+var showlocation = function(content) {
+    var self = this;
+    this.heading = content.heading;
+    this.position = content.location;
+    this.street = '',
+    this.phone = '';
+    this.city = '',
+    this.visible = ko.observable(true);
+// storing the position variable with location 
+    var link = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20160118' + '&query=' + this.heading;
+    $.getJSON(link).done(function(content) {
+		var output = data.response.venues[0];
+        self.street = output.location.formattedAddress[0] ||'No street found';
+        self.phone = output.contact.formattedPhone[1] ||'No phone found';
+        self.city = output.location.formattedAddress[2] ||'No city found';
+    }).fail(function() {
+        alert('Oops!!wrong handling with FourSquareAPI');
+    });
+    this.marker = new google.maps.Marker({
+        heading: this.heading,
+        position: this.position,
+        animation: google.maps.Animation.DROP,
+        icon: marker
+    });    
+    self.remove = ko.computed(function () {
+        if(self.visible() === true) {
+            self.marker.setMap(place);
+            place.fitBounds(edges);
+            edges.extend(self.marker.position);
+        } else {
+            self.marker.setMap(null);
         }
-    },
-    search: function(condition) {
-        seepage.list.removeAll();
-        for (var i = 0; i < some.length; i++) {
-            some[i].setVisible(false);
-        }
-        for(var j in places) {{
-            if(places[j].heading.toLowerCase().indexOf(condition.toLowerCase()) >= 0) {
-              seepage.list.push(places[j]);
-              var marker = places[j].location;
-                for (var i = 0; i< some.length; i++) {
-                    p=some[i].position.lat().toFixed(5);
-                    q=marker.lat.toFixed(5);
-                    r=some[i].position.lng().toFixed(5);
-                    s=marker.lng.toFixed(5);
-                    if (p == q &&
-                        r == s ){
-                            some[i].setVisible(true);
-                    }
-                }
-            }
-        }
-    }
-}
+    });
+    // show place selected from list
+    this.show = function(location) {
+        google.maps.event.trigger(self.marker, 'click');
+    };
+    this.marker.addListener('click', function() {
+        infoAttract(this, self.street, self.phone, self.city, openwindow);
+        setBounce(this);
+        place.panTo(this.getPosition());
+    });
+    // show bounce effect when list is selected
+    this.fall = function(place) {
+		google.maps.event.trigger(self.marker, 'click');
+	};
 };
-//gives the locations for our requirement
+/* main design function*/
+var Design = function() {
+    var self = this;
+    this.findplace = ko.observable('');
+    this.some = ko.observableArray([]);
+    // adding location for the selected
+    places.forEach(function(location) {
+        self.some.push( new showlocation(location) );
+    });
+    // places identified on map
+    this.placelist = ko.computed(function() {
+        var findfilter = self.findplace().toLowerCase();
+        if (findfilter) {
+            return ko.utils.arrayFilter(self.some(), function(location) {
+                var str = location.heading.toLowerCase();
+                var sink = str.includes(findfilter);
+                location.visible(sink);
+				return sink;
+			});
+        }
+        self.some().forEach(function(location) {
+            location.visible(true);
+        });
+        return self.some();
+    }, self);
+};
+//places that we want to display
 var places = [
     {
         heading: 'Railway Station', 
         location: {lat: 16.5442, lng:81.5375}, 
-        image: 'street:Housing Board colony,1-72/A'
-                        
     },
     {
         heading: 'Famous Hotel', 
         location: {lat: 16.5442479, lng: 81.5149185}, 
-        image: 'street:Juvalapallem Road'
     },
     {
         heading: 'Bus Station', 
         location: {lat: 16.5443195, lng: 81.5169033}, 
-        image : 'street:Menty Vari thota,phone:N/A'
     },
     {
         heading: 'Famous Temple', 
         location: {lat: 16.5428, lng: 81.5234113},
-        image : 'street:Gunupudi'
     },
     {
         heading: 'Top College', 
         location: {lat: 16.5674794, lng: 81.5217052}, 
-        image : 'street:vishnupur,phone:N/A'
-    }
+    },
     ];
-    seepage.initialize();
-    seepage.inputValue.subscribe(seepage.search);
-    ko.applyBindings(seepage);
-    function infoAttract(marker, openwindow){
-        setBounce(marker);
-        if(openwindow.marker != marker){
-            openwindow.marker = marker;
-            openwindow.setContent('');
-            windows(marker);
-            openwindow.open(place,marker);
-            openwindow.addListener('closeclick', function(){
-                openwindow.marker = null;
-            });
-        }
-    }
+// handle map error
 function googleMapsError() {
     alert('OOPS!got an Error');
+}
+//this function make the openwindow when it is clicked
+function infoAttract(marker, street, phone, city, openwindow) {
+    if (openwindow.marker != marker) {
+        openwindow.setContent('');
+        openwindow.marker = marker;
+        openwindow.addListener('closeclick', function() {
+            openwindow.marker = null;
+        });
+        var streetview = new google.maps.StreetViewService();
+        var radius = 30;
+        var windowContent = '<h5>' + marker.heading + '</h5>' + 
+            '<p>' + street + "</br>" + city + '</br>' + phone + "</p>";
+        var getview= function (content, status) {
+            if (status == google.maps.StreetViewStatus.OK) {
+                var viewlocation = data.location.latLng;
+                var heading = google.maps.geometry.spherical.computeHeading(
+                    viewlocation, marker.position);
+                openwindow.setContent(windowContent);
+            } 
+            else {
+                openwindow.setContent(windowContent + '<div style="color: darkorchid">No Street View Found</div>');
+            }
+        };
+        streetview.getPanoramaByLocation(marker.position, radius, getview);
+        openwindow.open(place, marker);
+    }
 }
