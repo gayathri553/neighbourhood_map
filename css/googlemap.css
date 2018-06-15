@@ -4,26 +4,28 @@
 }
 h1{
     color:darkorchid;
-    background-color:white
+    background-color:white;
     font-family:sans-serif;
     text-align:center;
 }
-img{
-    width:250px;
-    height:250px;
+@media screen and (min-width:300px) and (max-width:500px){
+    #googlemap{
+        width:50%;
+    }
+    #searchlist{
+        width:45%;
+    }
 }
-.searchbar
-{
-    width:100%;
-}
-.find {
-    float: left;
+.find{
     width:25%;
-    height:250px;
-    border: 2px solid darkorchid;
+    height:50px;
     margin-left:1050px;
-    margin-top: -500px;
+    margin-top:-500px;
+    border: 2px solid darkorchid;
 }
-
-
+#searchlist{
+    width:25%;
+    height:50px;
+    margin-left:1050px;
+}
 
