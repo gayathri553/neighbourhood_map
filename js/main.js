@@ -28,7 +28,7 @@ function setBounce(marker) {
           marker.setAnimation(null);
       }, 1400);
     }
-  }
+}
 //this function is used to show the location
 var showlocation = function(content) {
     var self = this;
@@ -125,7 +125,7 @@ var places = [
         heading: 'Top College', 
         location: {lat: 16.5674794, lng: 81.5217052}, 
     },
-    ];
+];
 // handle map error
 function googleMapsError() {
     alert('OOPS!got an Error');
@@ -141,16 +141,16 @@ function infoAttract(marker, street, phone, city, openwindow) {
         var streetview = new google.maps.StreetViewService();
         var radius = 30;
         var windowContent = '<h5>' + marker.heading + '</h5>' + 
-            '<p>' + street + "</br>" + city + '</br>' + phone + "</p>";
-        var getview= function (content, status) {
-            if (status == google.maps.StreetViewStatus.OK) {
+            '<p>' + street + "</br>" + phone + '</br>' + city + "</p>";
+        var getview= function (content, site) {
+            if (site == google.maps.StreetViewStatus.OK) {
                 var viewlocation = data.location.latLng;
                 var heading = google.maps.geometry.spherical.computeHeading(
                     viewlocation, marker.position);
                 openwindow.setContent(windowContent);
             } 
             else {
-                openwindow.setContent(windowContent + '<div style="color: darkorchid">No Street View Found</div>');
+                openwindow.setContent(windowContent + '<div style="color:darkorchid">No Street View Found</div>');
             }
         };
         streetview.getPanoramaByLocation(marker.position, radius, getview);
