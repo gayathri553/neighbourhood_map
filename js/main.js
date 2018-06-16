@@ -1,24 +1,24 @@
 // declaring global variables
-var openwindow,place,marker;
+var place,edges,marker;
+var openWindow;
 // request for JSON of foursquare data
-var clientID = 'D54CX2SYHKPSEIYEFTR0L3TXUWXBNQZWQANTWPOIAY4FKZYD';
-var clientSecret = 'RO0J1ML2QL05BH1CUKUW2DXPGL5X0V4MG5ZXDMXXUJHLUAAR';
+var clientID,clientSecret;
 // to get map ocation for our requriment
 function map() {
-    var bhimavaram = {
+    var Bhimavarm = {
         lat: 16.5443199,
         lng: 81.5169033
     };
-     place = new google.maps.Map(document.getElementById('googlemap'),
-    {
-        zoom:13,
-        center: bhimavaram
+    place = new google.maps.Map(document.getElementById('googlemap'), {
+        zoom: 13,
+        center: Bhimavarm,
+        mapTypeControl: false
     });
-    openwindow = new google.maps.InfoWindow();
+    openWindow = new google.maps.InfoWindow();
     edges = new google.maps.LatLngBounds();   
-    ko.applyBindings(new Design());
+    ko.applyBindings(new Desgin());
 }
-//set the Bounce function
+//set the Bounce function for marker
 function setBounce(marker) {
     if (marker.getAnimation() !== null) {
       marker.setAnimation(null);
@@ -28,57 +28,110 @@ function setBounce(marker) {
           marker.setAnimation(null);
       }, 1400);
     }
-}
+  }
+// to get places of my interest
+  var  places = [
+      {
+        heading: 'Railway Station',
+        location: 
+        {
+          lat:16.5442,
+          lng:81.5375
+        }
+      },  
+      {
+        heading: 'Famous Hotel',
+        location: 
+        {
+          lat: 16.5443199,
+          lng: 81.5169033
+        }
+      },
+       {
+        heading: 'Bus Station',
+        location: 
+        {
+          lat: 16.5443195,
+          lng: 81.5169033
+        }
+      }, 
+      {
+        heading: 'Famous Temple',
+        location: 
+        {
+          lat: 16.5428,
+          lng: 81.5234113
+        }
+      }, 
+      {
+        heading: 'Andhra college',
+        location: 
+        {
+          lat: 16.483458,
+          lng: 81.569175    
+        }
+      }, 
+      {
+        heading: 'Top College',
+        location: 
+        {
+          lat: 16.5674794,
+          lng: 81.5217052
+        }
+      }
+    ];
 //this function is used to show the location
 var showlocation = function(content) {
     var self = this;
     this.heading = content.heading;
     this.position = content.location;
     this.street = '',
-    this.phone = '';
     this.city = '',
+    this.phone = '';
     this.visible = ko.observable(true);
-// storing the position variable with location 
+    clientID = 'D54CX2SYHKPSEIYEFTR0L3TXUWXBNQZWQANTWPOIAY4FKZYD';
+    clientSecret = 'RO0J1ML2QL05BH1CUKUW2DXPGL5X0V4MG5ZXDMXXUJHLUAAR';
+    // storing the position variable with location 
     var link = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20160118' + '&query=' + this.heading;
     $.getJSON(link).done(function(content) {
-		var output = data.response.venues[0];
-        self.street = output.location.formattedAddress[0] ||'No street found';
-        self.phone = output.contact.formattedPhone[1] ||'No phone found';
-        self.city = output.location.formattedAddress[2] ||'No city found';
+		var output = content.response.venues[0];
+        self.street = output.location.formattedAddress[0] ? output.location.formattedAddress[0]: 'No street found';
+        self.city = output.location.formattedAddress[1] ? output.location.formattedAddress[1]: 'No City found';
+        self.phone = output.contact.formattedPhone ? output.contact.formattedPhone : 'No phone found';
     }).fail(function() {
-        alert('Oops!!wrong handling with FourSquareAPI');
+        alert('Oops!! some wrong with API foursquare');
     });
     this.marker = new google.maps.Marker({
-        heading: this.heading,
         position: this.position,
+        heading: this.heading,
         animation: google.maps.Animation.DROP,
         icon: marker
     });    
     self.remove = ko.computed(function () {
         if(self.visible() === true) {
             self.marker.setMap(place);
-            place.fitBounds(edges);
             edges.extend(self.marker.position);
+            place.fitBounds(edges);
         } else {
             self.marker.setMap(null);
         }
+    });    
+    this.marker.addListener('click', function() {
+        infoAttract(this, self.street, self.city, self.phone, openWindow);
+        setBounce(this);
+        place.panTo(this.getPosition());
     });
     // show place selected from list
     this.show = function(location) {
         google.maps.event.trigger(self.marker, 'click');
     };
-    this.marker.addListener('click', function() {
-        infoAttract(this, self.street, self.phone, self.city, openwindow);
-        setBounce(this);
-        place.panTo(this.getPosition());
-    });
     // show bounce effect when list is selected
     this.fall = function(place) {
 		google.maps.event.trigger(self.marker, 'click');
 	};
 };
 /* main design function*/
-var Design = function() {
+var Desgin = function() {
     var self = this;
     this.findplace = ko.observable('');
     this.some = ko.observableArray([]);
@@ -103,35 +156,8 @@ var Design = function() {
         return self.some();
     }, self);
 };
-//places that we want to display
-var places = [
-    {
-        heading: 'Railway Station', 
-        location: {lat: 16.5442, lng:81.5375}, 
-    },
-    {
-        heading: 'Famous Hotel', 
-        location: {lat: 16.5442479, lng: 81.5149185}, 
-    },
-    {
-        heading: 'Bus Station', 
-        location: {lat: 16.5443195, lng: 81.5169033}, 
-    },
-    {
-        heading: 'Famous Temple', 
-        location: {lat: 16.5428, lng: 81.5234113},
-    },
-    {
-        heading: 'Top College', 
-        location: {lat: 16.5674794, lng: 81.5217052}, 
-    },
-];
-// handle map error
-function googleMapsError() {
-    alert('OOPS!got an Error');
-}
 //this function make the openwindow when it is clicked
-function infoAttract(marker, street, phone, city, openwindow) {
+function infoAttract(marker, street, city, phone, openwindow) {
     if (openwindow.marker != marker) {
         openwindow.setContent('');
         openwindow.marker = marker;
@@ -139,21 +165,23 @@ function infoAttract(marker, street, phone, city, openwindow) {
             openwindow.marker = null;
         });
         var streetview = new google.maps.StreetViewService();
-        var radius = 30;
-        var windowContent = '<h5>' + marker.heading + '</h5>' + 
-            '<p>' + street + "</br>" + phone + '</br>' + city + "</p>";
-        var getview= function (content, site) {
+        var radius = 50;
+        var windowdata = '<h5>' + marker.heading + '</h5>' + 
+            '<p>' + street + "</br>" + city + '</br>' + phone + "</p>";
+        var getview = function (content, site) {
             if (site == google.maps.StreetViewStatus.OK) {
-                var viewlocation = data.location.latLng;
-                var heading = google.maps.geometry.spherical.computeHeading(
-                    viewlocation, marker.position);
-                openwindow.setContent(windowContent);
-            } 
+                var viewlocation = content.location.latLng;
+                openwindow.setContent(windowdata);
+            }
             else {
-                openwindow.setContent(windowContent + '<div style="color:darkorchid">No Street View Found</div>');
+                openwindow.setContent(windowdata + '<div style="color: darkorchid">No Street View Found</div>');
             }
         };
         streetview.getPanoramaByLocation(marker.position, radius, getview);
         openwindow.open(place, marker);
     }
+}
+  //function to map error
+function googleMapsError() {
+    alert('Oops!An error.');
 }
